@@ -21,3 +21,13 @@ y=df_AMD["Close"]
 
 plt.plot(x,y)
 plt.show()
+x=df_MSFT["Date"]
+y=df_MSFT["Close"]
+plt.plot(x,y)
+plt.show()
+x=df_GOOG["Date"]
+y=df_GOOG["Close"]
+
+plt.plot(x,y)
+plt.show()
+
