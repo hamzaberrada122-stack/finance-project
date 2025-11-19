@@ -14,11 +14,9 @@ df_GOOG=pd.read_csv(CSV_PATH_GOOG)
 df_MSFT=pd.read_csv(CSV_PATH_MSFT)  
 df_NVDA=pd.read_csv(CSV_PATH_NVDA)  
 
-print(df_AMD.columns)
-
+# line charts des valeurs des actions de chacune des compagnies
 x=df_AMD["Date"]
 y=df_AMD["Close"]
-
 plt.plot(x,y)
 plt.show()
 x=df_MSFT["Date"]
@@ -27,7 +25,11 @@ plt.plot(x,y)
 plt.show()
 x=df_GOOG["Date"]
 y=df_GOOG["Close"]
-
+plt.plot(x,y)
+plt.show()
+x=df_NVDA["Date"]
+y=df_NVDA["Close"]
 plt.plot(x,y)
 plt.show()
 
+# 
