@@ -4,13 +4,13 @@ import pandas as pd
 import os 
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-CSV_PATH_NVDA = os.path.join(BASE_DIR, "data", "raw", "NVDA.csv")
+CSV_PATH_MSFT = os.path.join(BASE_DIR, "data", "raw", "MSFT.csv")
 
-df_NVDA = pd.read_csv(CSV_PATH_NVDA, index_col='Date', parse_dates=True)
+df_MSFT = pd.read_csv(CSV_PATH_MSFT, index_col='Date', parse_dates=True)
 
 # Rolling channels
-max20 = df_NVDA['High'].rolling(window=20).max()
-min10 = df_NVDA['Low'].rolling(window=10).min()
+max20 = df_MSFT['High'].rolling(window=20).max()
+min10 = df_MSFT['Low'].rolling(window=10).min()
 
 # Shifts
 max20_yesterday = max20.shift(1)
@@ -18,15 +18,15 @@ max20_two_days = max20.shift(2)
 min10_yesterday = min10.shift(1)
 min10_two_days = min10.shift(2)
 
-close_today = df_NVDA['Close']
-close_yesterday = df_NVDA['Close'].shift(1)
+close_today = df_MSFT['Close']
+close_yesterday = df_MSFT['Close'].shift(1)
 
 # Copy df
-tortue_NVDA = df_NVDA.copy()
-tortue_NVDA['Buy'] = 0
-tortue_NVDA['Sell'] = 0
+tortue_MSFT = df_MSFT.copy()
+tortue_MSFT['Buy'] = 0
+tortue_MSFT['Sell'] = 0
 
-df_NVDA['Close'].plot()
+df_MSFT['Close'].plot()
 max20.plot(color='green')
 min10.plot(color='red')
 
@@ -34,16 +34,16 @@ min10.plot(color='red')
 # état de position
 in_position = False
 
-for date in tortue_NVDA.index:
+for date in tortue_MSFT.index:
 
     # BUY CONDITION
     if (not in_position) and \
        (close_today.loc[date] > max20_yesterday.loc[date]) and \
        (close_yesterday.loc[date] <= max20_two_days.loc[date]):
         
-        tortue_NVDA.loc[date, 'Buy'] = 1
+        tortue_MSFT.loc[date, 'Buy'] = 1
         in_position = True
-        print("BUY SIGNAL :", date, tortue_NVDA.loc[date, 'Close'])
+        print("BUY SIGNAL :", date, tortue_MSFT.loc[date, 'Close'])
         continue   # on passe au jour suivant pour eviter de buy et sell le meme jour
 
     # SELL CONDITION 
@@ -51,12 +51,12 @@ for date in tortue_NVDA.index:
        (close_today.loc[date] < min10_yesterday.loc[date]) and \
        (close_yesterday.loc[date] >= min10_two_days.loc[date]):
 
-        tortue_NVDA.loc[date, 'Sell'] = 1
+        tortue_MSFT.loc[date, 'Sell'] = 1
         in_position = False
-        print("SELL SIGNAL :", date, tortue_NVDA.loc[date, 'Close'])
+        print("SELL SIGNAL :", date, tortue_MSFT.loc[date, 'Close'])
 
-buy_points = tortue_NVDA[tortue_NVDA['Buy']==1]['Close']
-sell_points = tortue_NVDA[tortue_NVDA['Sell']==1]['Close']
+buy_points = tortue_MSFT[tortue_MSFT['Buy']==1]['Close']
+sell_points = tortue_MSFT[tortue_MSFT['Sell']==1]['Close']
 plt.scatter(buy_points.index, buy_points, marker='^', s=100, color='green', label='Buy Signal')
 plt.scatter(sell_points.index, sell_points, marker='v', s=100, color='red', label='Sell Signal')
 
@@ -67,7 +67,7 @@ plt.show()
 
 trades = []
 
-for date, row in tortue_NVDA.iterrows():
+for date, row in tortue_MSFT.iterrows():
     if row['Buy'] == 1:
         trades.append({'Date': date, 'Side': 'BUY', 'Price': row['Close']})
     elif row['Sell'] == 1:
@@ -99,8 +99,7 @@ pnl = pd.DataFrame(pnl_events).set_index('Date')
 pnl['Equity'] = pnl['PnL'].cumsum()
 
 # Étaler sur toutes les dates du backtest
-equity = pnl['Equity'].reindex(tortue_NVDA.index, method='ffill').fillna(0)
-print(equity)
+equity = pnl['Equity'].reindex(tortue_MSFT.index, method='ffill').fillna(0)
 
 # Plot
 plt.figure(figsize=(12, 6))
